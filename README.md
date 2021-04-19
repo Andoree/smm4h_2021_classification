@@ -106,7 +106,7 @@ Training hyperparameters (scripts/training/train_config.ini):
   
 	EVALUATION_FILENAME - Evaluation filename
 
-Training script:
+5. Model training:
 
 ```
 python3 scripts/training/train_drug_text_bert.py
@@ -114,4 +114,15 @@ python3 scripts/training/train_drug_text_bert.py
 
 ## Ensembling & evaluation
 
+6. Majority voting:
+
+```
+python3 scripts/evaluation/majority_voting.py --predicted_probs_dir $pred_probas --data_tsv data/smm4h_21_data/ru/tweets_w_smiles/test.tsv --probas_fname pred_test_probas.txt --threshold 0.5 --output_path prediction.tsv
+```
+
+7. Making two-column submission file:
+
+```
+python3 scripts/evaluation/make_prediction.py --prediction_tsv prediction.tsv --prediction_column Class --lang en --output_path submission_prediction.tsv
+```
 
