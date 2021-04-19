@@ -43,7 +43,7 @@ def main():
     all_predictions['sum'] = (all_predictions >= 0.5).sum(axis=1)
     all_predictions['final_label'] = all_predictions['sum'].apply(lambda x: 1 if x >= len(columns) / 2 else 0)
 
-    data_df = pd.read_csv(data_tsv_path, sep="\t", encoding="utf-8", quoting=3)
+    data_df = pd.read_csv(data_tsv_path, sep="\t", encoding="utf-8",)
     if calculate_metrics:
         true_labels_df = data_df["class"]
         print(classification_report(true_labels_df, all_predictions['final_label']))
