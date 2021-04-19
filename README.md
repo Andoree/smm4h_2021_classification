@@ -60,7 +60,7 @@ Training hyperparameters (scripts/training/train_config.ini):
   
 	INPUT_DIR - Dataset directory that contains train.tsv, dev.tsv and test.tsv files
   
-	DRUG_EMBEDDINGS_FROM - Drug embeddings source. "chemberta" setup loads HuggingFace's ChemBERTa model and encodes drugs dynamically. "sider" setup uses pre-calculated embeddings from train/dev/test.tsv file
+	DRUG_EMBEDDINGS_FROM - Drug embeddings source. "chemberta" setup loads HuggingFace's ChemBERTa model and encodes drugs dynamically.
   
 	[PARAMETERS]
   
