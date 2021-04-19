@@ -54,6 +54,63 @@ python3 scripts/preprocessing/merge_tweets_sets.py --input_files data/smm4h_21_d
 
 ## Training
 
+Training hyperparameters (scripts/training/train_config.ini):
+
+	[INPUT]
+  
+	INPUT_DIR - Dataset directory that contains train.tsv, dev.tsv and test.tsv files
+  
+	DRUG_EMBEDDINGS_FROM - Drug embeddings source. "chemberta" setup loads HuggingFace's ChemBERTa model and encodes drugs dynamically. "sider" setup uses pre-calculated embeddings from train/dev/test.tsv file
+  
+	[PARAMETERS]
+  
+	SEED - random state
+  
+	MAX_TEXT_LENGTH - Text encoder maximum sequence length
+  
+	MAX_MOLECULE_LENGTH - Drug encoder maximum sequence length
+  
+	BATCH_SIZE - Batch size
+  
+	LEARNING_RATE - Training learning rate
+  
+	DROPOUT - Dense classification layer dropout probability
+  
+	NUM_EPOCHS - Maximum number of training epochs
+  
+	APPLY_UPSAMPLING - Boolean. Whether to use positive class oversampling
+  
+	USE_WEIGHTED_LOSS - Boolean. Whether to use weighted loss to increase the positive class weight
+
+	LOSS_WEIGHT - Positive class weight. if set to '-1', class weights will be proportional to theirs inverted frequencies
+  
+	MODEL_TYPE - Model architecture
+  
+	TEXT_ENCODER_NAME - Text encoder model HuggingFace's name.
+  
+	DRUG_SAMPLING - Drug sampling type. "random": During training, a drug from each sample is drawn at random when there are multiple drug mentions. "first" : The first found drug is used.
+  
+	[UPSAMPLING]
+  
+	UPSAMPLING_WEIGHT - Upsampling weight. It is used if APPLY_UPSAMPLING is set to True. if set to '-1', class sampling probabilities will be proportional to theirs inverted frequencies
+  
+	[CROSSATT_PARAM] - Drug-text Cross-attention architecture hyperparameters
+  
+	CROSSATT_DROPOUT - Cross-attention layer token-level dropout probability
+  
+	CROSSATT_HIDDEN_DROPOUT - Cross-attention hidden layer dropour probability
+
+	[OUTPUT]
+  
+	OUTPUT_DIR - Output directory. Contains model checkpoint, evaluation results, predicted labeld and probabilities
+  
+	EVALUATION_FILENAME - Evaluation filename
+
+Training script:
+
+```
+python3 scripts/training/train_drug_text_bert.py
+```
 
 ## Ensembling & evaluation
 
