@@ -213,7 +213,6 @@ def train_evaluate(bert_classifier, train_loader, dev_loader, optimizer, criteri
     valid_history = []
     valid_history_f1 = []
 
-    best_valid_loss = float('inf')
     best_f1_score = 0.0
     best_epoch = -1
 
@@ -468,7 +467,6 @@ def main():
     use_weighted_loss = config.getboolean("PARAMETERS", "USE_WEIGHTED_LOSS")
     loss_weight = config.getfloat("PARAMETERS", "LOSS_WEIGHT")
     model_type = config["PARAMETERS"]["MODEL_TYPE"]
-    encoder_state_path = config["PARAMETERS"]["ENCODER_STATE_PATH"]
     train_drug_sampling_type = config["PARAMETERS"]["DRUG_SAMPLING"]
     output_dir = config["OUTPUT"]["OUTPUT_DIR"]
     output_dir = os.path.join(output_dir, f"seed_{seed}")
@@ -519,8 +517,7 @@ def main():
     print("#Trainable params: ", sum(p.numel() for p in bert_text_encoder.parameters() if p.requires_grad))
 
     text_tokenizer = AutoTokenizer.from_pretrained(text_encoder_name, cache_dir="models/")
-    if encoder_state_path != '-1':
-        bert_text_encoder.load_state_dict(torch.load(encoder_state_path))
+
     if model_type == "attention" or model_type == "concat":
         chemberta_tokenizer = AutoTokenizer.from_pretrained("seyonec/ChemBERTa_zinc250k_v2_40k", cache_dir="models/")
     else:
