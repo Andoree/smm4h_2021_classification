@@ -14,6 +14,7 @@ Russian tweets:
 python3 preprocess_tweet_texts.py --input_dir data/smm4h_21_data/ru/raw --lang ru --output_dir data/smm4h_21_data/ru/preprocessed
 ```
 2. Finding drug mentions and mapping the mentions to Drugbank:
+
 English tweets:
 ```
 python3 map_en_tweets_to_drugbank.py --input_tweets_path data/smm4h_21_data/en/preprocessed/train.tsv --input_drugbank_path data/drugbank_aliases.json --not_matched_path data/smm4h_21_data/en/not_matched_en_train.tsv --output_path data/smm4h_21_data/en/tweets_w_drugs/train.tsv
