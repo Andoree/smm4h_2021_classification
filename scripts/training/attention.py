@@ -85,3 +85,48 @@ class BertCrossattLayer(nn.Module):
         output = self.att(input_tensor, ctx_tensor, ctx_att_mask)
         attention_output = self.output(output, input_tensor)
         return attention_output
+
+
+class GatedMultimodalLayer(nn.Module):
+    """ Gated Multimodal Layer based on 'Gated multimodal networks, Arevalo1 et al.' (https://arxiv.org/abs/1702.01992) """
+
+    def __init__(self, text_modality_dim, chem_modality_dim, size_out):
+        super().__init__()
+        self.text_modality_dim = text_modality_dim
+        self.chem_modality_dim = chem_modality_dim
+        self.size_out = size_out
+        self.resize_text = True
+        if chem_modality_dim == size_out:
+            self.resize_chem = False
+        else:
+            self.resize_chem = True
+
+        if self.resize_text:
+            self.text_resize_linear = nn.Sequential(
+                nn.Linear(text_modality_dim, size_out),
+                nn.Tanh()
+            )
+
+        if self.resize_chem:
+            self.chem_resize_linear = nn.Sequential(
+                nn.Linear(chem_modality_dim, size_out),
+                nn.Tanh()
+            )
+        self.sigmoid_layer = nn.Sequential(
+            nn.Linear(size_out * 2, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, text_features, chem_features):
+        if self.resize_text:
+            text_hidden = self.text_resize_linear(text_features)
+        else:
+            text_hidden = text_features
+        if self.resize_chem:
+            chem_hidden = self.chem_resize_linear(chem_features)
+        else:
+            chem_hidden = chem_features
+        x = torch.cat((text_hidden, chem_hidden), dim=1)  # B x 2 * size_out
+        z = self.sigmoid_layer(x)
+
+        return z.view(z.size()[0], 1) * text_hidden + (1 - z).view(z.size()[0], 1) * chem_hidden
