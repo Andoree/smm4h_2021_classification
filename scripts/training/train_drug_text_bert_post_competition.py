@@ -516,20 +516,29 @@ def main():
     parser.add_argument('--dropout_p', default=0.3, type=float)
     parser.add_argument('--num_epochs', default=10, type=int)
     parser.add_argument('--text_encoder_name', type=str, required=True)
-    parser.add_argument('--apply_upsampling', action="store_true")
+    parser.add_argument('--apply_upsampling', action="store_true", help="Whether to over-sample the positive class")
     parser.add_argument('--freeze_layer_count', default=0, type=int)
     parser.add_argument('--freeze_embeddings_layer', action="store_true")
     parser.add_argument('--use_weighted_loss', action="store_true")
     parser.add_argument('--loss_weight', default=-1.0, type=float, )
-    parser.add_argument('--model_type', type=str, required=True)
-    parser.add_argument('--mask_drug', action="store_true")
-    parser.add_argument('--drug_sampling_type', type=str, required=True)
-    parser.add_argument('--drug_features_paths', type=str, nargs='+', required=True)
+    parser.add_argument('--model_type', type=str, required=True, help="Model type: 'simple' for uni-modal and bi-modal"
+                                                                      "concatenation model, 'attention' for bi-modal"
+                                                                      "cross-attention model ")
+    parser.add_argument('--mask_drug', action="store_true", help="Whether to mask textual drug mentions in input text",)
+    parser.add_argument('--drug_sampling_type', type=str, required=True, help="Drug sampling strategy is either first,"
+                                                                              "random, sum, or mean. It defines the way"
+                                                                              "to combine drug features of multiple"
+                                                                              "drugs of an input sample")
+    parser.add_argument('--drug_features_paths', type=str, nargs='+', required=True, help="If passed, than a bi-modal model"
+                                                                                          "is trained instead of uni-modal"
+                                                                                          "text classifier")
     parser.add_argument('--input_data_dir', type=str, required=True)
     parser.add_argument('--drugs_dict_path', type=str, required=False)
     parser.add_argument('--output_dir', type=str, required=True)
     parser.add_argument('--output_evaluation_filename', type=str, default="evaluation.txt")
-    parser.add_argument('--upsampling_weight', type=float, required=False)
+    parser.add_argument('--upsampling_weight', type=float, required=False, help="If apply_upsampling key is passed,"
+                                                                                "this parameter defines the positive"
+                                                                                "class ovsampling weight")
     parser.add_argument('--crossatt_hidden_dropout', type=float, default=0.1, required=False)
     parser.add_argument('--crossatt_dropout', type=float, default=0.1, required=False)
     parser.add_argument('--use_train_subsets', action="store_true")
@@ -541,7 +550,8 @@ def main():
     parser.add_argument('--extra_test_sets', default=None, type=str, nargs='+')
     parser.add_argument('--use_train_fracs', action="store_true")
     parser.add_argument('--num_attention_heads', required=False, type=int)
-    parser.add_argument('--no_early_stopping', action="store_false")
+    parser.add_argument('--no_early_stopping', action="store_false", help="Disable early stopping and the best epoch"
+                                                                          "parameters loading")
     args = parser.parse_args()
 
     max_length = args.max_length
@@ -613,7 +623,7 @@ def main():
     else:
         criterion = nn.BCEWithLogitsLoss().to(device)
 
-    text_tokenizer = AutoTokenizer.from_pretrained(f"./models/{text_encoder_name}/model", )
+    text_tokenizer = AutoTokenizer.from_pretrained(text_encoder_name,)
     drug_str_emb_dict = None
     # drug_features_dict = None
     drug_features_dicts_list = None
@@ -636,7 +646,7 @@ def main():
             drugs_dict_path = args.drugs_dict_path
             drug_features_str = f"text_drug_{text_encoder_name.split('/')[-1]}"
             drugs_dictionary = load_drugs_dict(drugs_dict_path)
-            bert_text_encoder = AutoModel.from_pretrained(f"./models/{text_encoder_name}/model", ).to(device)
+            bert_text_encoder = AutoModel.from_pretrained(text_encoder_name,).to(device)
             drug_str_emb_dict = encode_drug_text_mentions(drugs_strs=drugs_dictionary, max_seq_length=max_length,
                                                           text_encoder=bert_text_encoder, text_tokenizer=text_tokenizer)
             drug_features_size = len(list(drug_str_emb_dict.values())[0])
@@ -655,7 +665,7 @@ def main():
     cross_att_flag = False
     if chem_encoder_name is not None:
         cross_att_flag = True
-        chemberta_tokenizer = AutoTokenizer.from_pretrained(f"./models/{chem_encoder_name}/model", )
+        chemberta_tokenizer = AutoTokenizer.from_pretrained(chem_encoder_name, )
 
     train_drug_sampling_type = drug_sampling_type
     train_tweets_dataset = TweetsDataset(train_df, text_tokenizer, text_max_length=max_length,
@@ -795,7 +805,7 @@ def main():
             torch.cuda.random.manual_seed_all(seed)
             torch.backends.cudnn.deterministic = True
 
-            bert_text_encoder = AutoModel.from_pretrained(f"./models/{text_encoder_name}/model", )
+            bert_text_encoder = AutoModel.from_pretrained(text_encoder_name, )
 
             if freeze_layer_count > 0:
                 for layer in bert_text_encoder.encoder.layer[:freeze_layer_count]:
@@ -840,7 +850,7 @@ def main():
                 cross_att_attention_dropout = args.crossatt_dropout
                 cross_att_hidden_dropout = args.crossatt_hidden_dropout
                 chem_encoder_name = args.chem_encoder_name
-                chem_encoder = AutoModel.from_pretrained(f"./models/{chem_encoder_name}/model", ).to(device)
+                chem_encoder = AutoModel.from_pretrained(chem_encoder_name, ).to(device)
                 # for param in chem_encoder.parameters():
                 #    param.requires_grad = False
                 print("#Trainable chem encoder params: ",
