@@ -54,6 +54,10 @@ python3 scripts/preprocessing/merge_tweets_sets.py --input_files data/smm4h_21_d
 
 ## Training
 
+#### SMM4H competition
+
+For the official participation in the SMM4H 2021 Shared task, we used a script with the following set of hyperparameters:
+
 Training hyperparameters (scripts/training/train_config.ini):
 
 	[INPUT]
@@ -106,11 +110,22 @@ Training hyperparameters (scripts/training/train_config.ini):
   
 	EVALUATION_FILENAME - Evaluation filename
 
-5. Model training:
+5. Model training (SMM4H 2021 Shared task version):
 
 ```
-python3 scripts/training/train_drug_text_bert.py
+python3 scripts/training/train_drug_text_bert_competition.py
 ```
+
+####  Post-SMM4H training script 
+
+For our experiments after the SMM4H 2021 competition, we used a slightly modified script ('scripts/training/train_drug_text_bert_post_competition.py').
+
+
+Training in the SMM4H 2020 french using bi-modal attention-based model
+```
+python train_drug_text_bert_post_competition.py --input_data_dir="../../data/smm4h_2020_data/fr/w_smiles" --num_epochs 10 --apply_upsampling --upsampling_weight 10.0   --freeze_layer_count 5 --freeze_embeddings_layer --text_encoder_name camembert-base --model_type attention --drug_sampling_type random --drug_features_path="../../data/additional_data/features/chemberta_drugs.txt" --output_dir="results/smm4h_2020/attention"
+```
+
 
 ## Ensembling & evaluation
 
