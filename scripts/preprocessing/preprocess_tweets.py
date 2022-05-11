@@ -188,7 +188,7 @@ def get_atc_codes_by_drug_ids(data_df: pd.DataFrame, possible_atc_codes: Iterabl
 def main():
     parser = ArgumentParser()
 
-    parser.add_argument('--input_data_dir', default=r"../../data/smm4h_data/fr_20/raw/",
+    parser.add_argument('--input_data_dir', default=r"../../data/smm4h_datasets/en_21_custom_test/raw/",
                         help="Path to the directory that contains train, dev, and test sets to be preprocessed.")
     parser.add_argument('--ru_drug_terms_path', default=r"../../data/df_all_terms_ru_en.csv", required=False,
                         help="Path to the csv file that contains the mapping between the Russian and English terms.")
@@ -198,9 +198,9 @@ def main():
     parser.add_argument('--drugbank_metadata_path', default=r"../../data/drugbank_database.csv",
                         help="Path to the csv file that contains drug metadata for each Drug identified with DrugBank"
                              "id. This file contains ATC codes and SMILES strings.")
-    parser.add_argument('--language', default=r"fr",
+    parser.add_argument('--language', default=r"en",
                         help="Language of tweets to be preprocessed.")
-    parser.add_argument('--output_dir', default=r"../../data/smm4h_data/fr_20/preprocessed_tweets/", )
+    parser.add_argument('--output_dir', default=r"../../data/smm4h_datasets/en_21_custom_test/preprocessed_tweets/", )
     args = parser.parse_args()
 
     input_data_dir = args.input_data_dir
@@ -222,11 +222,12 @@ def main():
             raise Exception(f"Invalid filename: {filename}")
         input_tweets_path = os.path.join(input_data_dir, filename)
         output_path = os.path.join(output_dir, filename)
-        tweets_df = pd.read_csv(input_tweets_path, sep='\t', quoting=3, )
+        tweets_df = pd.read_csv(input_tweets_path, sep='\t', quoting=3, dtype={"tweet_id": str, "user_id": str})
         # Removing duplicated tweets
         if dataset_type != "test":
             logging.info(f"Filtering duplicates in {dataset_type}. There are {tweets_df.shape[0]} in total.")
             tweets_df.drop_duplicates(inplace=True)
+            tweets_df.reset_index(inplace=True, drop=True)
             logging.info(f"There are {tweets_df.shape[0]} in {dataset_type} after duplicates filtering.")
         # Finding drug mentions and mapping them to DrugBank id
         if language == "ru":
@@ -266,10 +267,13 @@ def main():
         # Assigning ATC codes to tweets
         drugbank_id_atc_code_df = drugbank_metadata_df[["drugbank_id", "atc_codes"]]
         drugbank_id_atc_code_df.set_index("drugbank_id", inplace=True)
-        possible_atc_first_chars_set = get_atc_codes_first_char_values_set(drugbank_metadata_df["atc_codes"].values)
-        possible_atc_first_chars_set = sorted(possible_atc_first_chars_set)
+        possible_atc_first_chars_set = ("A", "B", "C", "D", "G", "H", "J", "L", "M", "N", "P", "R", "S", "V")
+        # possible_atc_first_chars_set = get_atc_codes_first_char_values_set(drugbank_metadata_df["atc_codes"].values)
+        # possible_atc_first_chars_set = sorted(possible_atc_first_chars_set)
         drugbank_id_atc_code_df = drugbank_id_atc_code_df.squeeze()
+
         atc_features_df = get_atc_codes_by_drug_ids(tweets_df, possible_atc_first_chars_set, drugbank_id_atc_code_df)
+
         tweets_df = pd.concat((tweets_df, atc_features_df), axis=1)
 
         if "label" in tweets_df.columns:
@@ -280,7 +284,7 @@ def main():
         # Preprocessing texts: url, username, masking; emoji replacing
         tweets_df['tweet'] = tweets_df['tweet'].apply(lambda x: preprocess_tweet_text(x, emoji_mapping, amp_replace))
 
-        tweets_df.to_csv(output_path, sep='\t', index=False, )
+        tweets_df.to_csv(output_path, sep='\t', index=False, quoting=3)
 
 
 if __name__ == '__main__':
