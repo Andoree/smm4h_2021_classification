@@ -1,50 +1,59 @@
 # smm4h_2021_classification
 
 
+
+
 ## Preprocessing
 
-1. Preprocessing tweets text:
-
-English tweets:
+1. Extract data archive:
 ```
-python3 scripts/preprocessing/preprocess_tweet_texts.py --input_dir data/smm4h_21_data/en/raw --lang en --output_dir data/smm4h_21_data/en/preprocessed
-```
-Russian tweets:
-```
-python3 scripts/preprocessing/preprocess_tweet_texts.py --input_dir data/smm4h_21_data/ru/raw --lang ru --output_dir data/smm4h_21_data/ru/preprocessed
-```
-2. Finding drug mentions and mapping the mentions to Drugbank:
-
-English tweets:
-```
-python3 scripts/preprocessing/map_en_tweets_to_drugbank.py --input_tweets_path data/smm4h_21_data/en/preprocessed/train.tsv --input_drugbank_path data/drugbank_aliases.json --not_matched_path data/smm4h_21_data/en/not_matched_en_train.tsv --output_path data/smm4h_21_data/en/tweets_w_drugs/train.tsv
-python3 scripts/preprocessing/map_en_tweets_to_drugbank.py --input_tweets_path data/smm4h_21_data/en/preprocessed/dev.tsv --input_drugbank_path data/drugbank_aliases.json --not_matched_path data/smm4h_21_data/en/not_matched_en_dev.tsv --output_path data/smm4h_21_data/en/tweets_w_drugs/dev.tsv
-python3 scripts/preprocessing/map_en_tweets_to_drugbank.py --input_tweets_path data/smm4h_21_data/en/preprocessed/test.tsv --input_drugbank_path data/drugbank_aliases.json --not_matched_path data/smm4h_21_data/en/not_matched_en_test.tsv --output_path data/smm4h_21_data/en/tweets_w_drugs/test.tsv
-```
-Russian tweets:
-```
-python3 scripts/preprocessing/map_ru_tweets_to_drugbank.py --input_tweets_path data/smm4h_21_data/ru/preprocessed/train.tsv --input_drugbank_path data/df_all_terms_ru_en.csv --not_matched_path data/smm4h_21_data/ru/not_matched_ru_train.tsv --output_path data/smm4h_21_data/ru/tweets_w_drugs/train.tsv
-python3 scripts/preprocessing/map_ru_tweets_to_drugbank.py --input_tweets_path data/smm4h_21_data/ru/preprocessed/valid.tsv --input_drugbank_path data/df_all_terms_ru_en.csv --not_matched_path data/smm4h_21_data/ru/not_matched_ru_dev.tsv --output_path data/smm4h_21_data/ru/tweets_w_drugs/dev.tsv
-python3 scripts/preprocessing/map_ru_tweets_to_drugbank.py --input_tweets_path data/smm4h_21_data/ru/preprocessed/test.tsv --input_drugbank_path data/df_all_terms_ru_en.csv --not_matched_path data/smm4h_21_data/ru/not_matched_ru_test.tsv --output_path data/smm4h_21_data/ru/tweets_w_drugs/test.tsv
+unzip data.zip
 ```
 
-3. Getting drug SMILES strings:
+2. Preprocessing tweets text:
 
-English tweets:
+SMM4H 2021 English tweets (original test set):
 ```
-python3 scripts/preprocessing/get_tweets_smiles.py --input_drugbank data/drugbank_database.csv --input_tweets data/smm4h_21_data/en/tweets_w_drugs/train.tsv --output_path data/smm4h_21_data/en/tweets_w_smiles/train.tsv
-python3 scripts/preprocessing/get_tweets_smiles.py --input_drugbank data/drugbank_database.csv --input_tweets data/smm4h_21_data/en/tweets_w_drugs/dev.tsv --output_path data/smm4h_21_data/en/tweets_w_smiles/dev.tsv
-python3 scripts/preprocessing/get_tweets_smiles.py --input_drugbank data/drugbank_database.csv --input_tweets data/smm4h_21_data/en/tweets_w_drugs/test.tsv --output_path data/smm4h_21_data/en/tweets_w_smiles/test.tsv
-```
-Russian tweets
-
-```
-python3 scripts/preprocessing/get_tweets_smiles.py --input_drugbank data/drugbank_database.csv --input_tweets data/smm4h_21_data/ru/tweets_w_drugs/train.tsv --output_path data/smm4h_21_data/ru/tweets_w_smiles/train.tsv
-python3 scripts/preprocessing/get_tweets_smiles.py --input_drugbank data/drugbank_database.csv --input_tweets data/smm4h_21_data/ru/tweets_w_drugs/dev.tsv --output_path data/smm4h_21_data/ru/tweets_w_smiles/dev.tsv
-python3 scripts/preprocessing/get_tweets_smiles.py --input_drugbank data/drugbank_database.csv --input_tweets data/smm4h_21_data/ru/tweets_w_drugs/test.tsv --output_path data/smm4h_21_data/ru/tweets_w_smiles/test.tsv
+python preprocess_tweets.py --input_data_dir="../../data/smm4h_datasets/en_21/raw/" \
+--ru_drug_terms_path="../../data/df_all_terms_ru_en.csv" \
+--drugbank_term2drugbank_id_path="../../data/drugbank_aliases.json" \
+--drugbank_metadata_path="../../data/drugbank_database.csv" \
+--language="en" \
+--output_dir="../../data/smm4h_datasets/en_21/preprocessed_tweets/"
 ```
 
-4. Combining the Russian and English tweets sets:
+SMM4H 2021 English tweets (Custom test set obtained by splitting the original train into train and test sets):
+```
+python preprocess_tweets.py --input_data_dir="../../data/smm4h_datasets/en_21_dev_as_test/raw/" \
+--ru_drug_terms_path="../../data/df_all_terms_ru_en.csv" \
+--drugbank_term2drugbank_id_path="../../data/drugbank_aliases.json" \
+--drugbank_metadata_path="../../data/drugbank_database.csv" \
+--language="en" \
+--output_dir="../../data/smm4h_datasets/en_21_dev_as_test/preprocessed_tweets/"
+```
+
+SMM4H 2020 French tweets:
+```
+python preprocess_tweets.py --input_data_dir="../../data/smm4h_datasets/fr_20/raw/" \
+--ru_drug_terms_path="../../data/df_all_terms_ru_en.csv" \
+--drugbank_term2drugbank_id_path="../../data/drugbank_aliases.json" \
+--drugbank_metadata_path="../../data/drugbank_database.csv" \
+--language="fr" \
+--output_dir="../../data/smm4h_datasets/fr_20/preprocessed_tweets/"
+```
+
+SMM4H 2021 Russian tweets:
+```
+python preprocess_tweets.py --input_data_dir="../../data/smm4h_datasets/ru_21/raw/" \
+--ru_drug_terms_path="../../data/df_all_terms_ru_en.csv" \
+--drugbank_term2drugbank_id_path="../../data/drugbank_aliases.json" \
+--drugbank_metadata_path="../../data/drugbank_database.csv" \
+--language="ru" \
+--output_dir="../../data/smm4h_datasets/ru_21/preprocessed_tweets/"
+```
+
+
+3. Combining the Russian and English tweets sets:
 ```
 python3 scripts/preprocessing/merge_tweets_sets.py --input_files data/smm4h_21_data/ru/tweets_w_smiles/train.tsv data/smm4h_21_data/en/tweets_w_smiles/train.tsv --output_path data/smm4h_21_data/ruen/tweets_w_smiles/train.tsv
 python3 scripts/preprocessing/merge_tweets_sets.py --input_files data/smm4h_21_data/ru/tweets_w_smiles/dev.tsv data/smm4h_21_data/en/tweets_w_smiles/dev.tsv --output_path data/smm4h_21_data/ruen/tweets_w_smiles/dev.tsv
@@ -110,7 +119,7 @@ Training hyperparameters (scripts/training/train_config.ini):
   
 	EVALUATION_FILENAME - Evaluation filename
 
-5. Model training (SMM4H 2021 Shared task version):
+4. Model training (SMM4H 2021 Shared task version):
 
 ```
 python3 scripts/training/train_drug_text_bert_competition.py
@@ -129,13 +138,13 @@ python train_drug_text_bert_post_competition.py --input_data_dir="../../data/smm
 
 ## Ensembling & evaluation
 
-6. Majority voting:
+5. Majority voting:
 
 ```
 python3 scripts/evaluation/majority_voting.py --predicted_probs_dir $pred_probas --data_tsv data/smm4h_21_data/ru/tweets_w_smiles/test.tsv --probas_fname pred_test_probas.txt --threshold 0.5 --output_path prediction.tsv
 ```
 
-7. Making two-column submission file:
+6. Making two-column submission file:
 
 ```
 python3 scripts/evaluation/make_prediction.py --prediction_tsv prediction.tsv --prediction_column Class --lang en --output_path submission_prediction.tsv
