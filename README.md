@@ -132,7 +132,20 @@ For our experiments after the SMM4H 2021 competition, we used a slightly modifie
 
 Training in the SMM4H 2020 french using bi-modal attention-based model
 ```
-python train_drug_text_bert_post_competition.py --input_data_dir="../../data/smm4h_2020_data/fr/w_smiles" --num_epochs 10 --apply_upsampling --upsampling_weight 10.0   --freeze_layer_count 5 --freeze_embeddings_layer --text_encoder_name camembert-base --model_type attention --drug_sampling_type random --drug_features_path="../../data/additional_data/features/chemberta_drugs.txt" --output_dir="results/smm4h_2020/attention"
+python train_drug_text_bert_post_competition.py --input_data_dir="../../data/smm4h_datasets/fr_20/preprocessed_tweets/" \
+--num_epochs 10 \
+--max_length=128 \
+--batch_size=64 \
+--learning_rate=3e-5 \
+--apply_upsampling \
+--upsampling_weight 10.0 \
+--freeze_layer_count 5 \
+--freeze_embeddings_layer \
+--text_encoder_name camembert-base \
+--model_type attention \
+--drug_sampling_type random \
+--drug_features_path="../../data/additional_data/features/chemberta_drugs.txt" \
+--output_dir="results/smm4h_2020/attention"
 ```
 
 
@@ -141,12 +154,19 @@ python train_drug_text_bert_post_competition.py --input_data_dir="../../data/smm
 5. Majority voting:
 
 ```
-python3 scripts/evaluation/majority_voting.py --predicted_probs_dir $pred_probas --data_tsv data/smm4h_21_data/ru/tweets_w_smiles/test.tsv --probas_fname pred_test_probas.txt --threshold 0.5 --output_path prediction.tsv
+python3 scripts/evaluation/majority_voting.py --predicted_probs_dir $pred_probas \
+--data_tsv data/smm4h_21_data/ru/tweets_w_smiles/test.tsv \
+--probas_fname pred_test_probas.txt \
+--threshold 0.5 \
+--output_path prediction.tsv
 ```
 
 6. Making two-column submission file:
 
 ```
-python3 scripts/evaluation/make_prediction.py --prediction_tsv prediction.tsv --prediction_column Class --lang en --output_path submission_prediction.tsv
+python3 scripts/evaluation/make_prediction.py --prediction_tsv prediction.tsv \
+--prediction_column Class \
+--lang en \
+--output_path submission_prediction.tsv 
 ```
 
