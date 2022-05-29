@@ -144,7 +144,7 @@ python train_drug_text_bert_post_competition.py --input_data_dir="../../data/smm
 --text_encoder_name camembert-base \
 --model_type attention \
 --drug_sampling_type random \
---drug_features_path="../../data/additional_data/features/chemberta_drugs.txt" \
+--drug_features_path="../../data/drug_features/drug_features/chemberta_features.txt" \
 --output_dir="results/smm4h_2020/attention"
 ```
 
