@@ -13,7 +13,7 @@ cd data/
 
 unzip  drugbank_aliases_and_metadata.zip
 ```
-drugbank_aliases_and_metadata.zip archive contains the mapping from DrugBank IDs to precomputed drug embeddings.
+drugbank_aliases_and_metadata.zip archive contains the mappings from DrugBank IDs to precomputed drug embeddings.
 
 2. Preprocessing tweets text:
 
