@@ -8,7 +8,12 @@
 1. Extract data archive:
 ```
 unzip data.zip
+
+cd data/
+
+unzip  drugbank_aliases_and_metadata.zip
 ```
+drugbank_aliases_and_metadata.zip archive contains the mapping from DrugBank IDs to precomputed drug embeddings.
 
 2. Preprocessing tweets text:
 
@@ -169,4 +174,9 @@ python3 scripts/evaluation/make_prediction.py --prediction_tsv prediction.tsv \
 --lang en \
 --output_path submission_prediction.tsv 
 ```
+
+## Environment
+
+The code is tested with Python 3.8 and Torch 1.8.1. For more details on versions of Python libraries please refer to requirements.txt.
+
 
